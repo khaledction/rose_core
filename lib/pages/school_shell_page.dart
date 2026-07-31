@@ -5549,6 +5549,11 @@ class _SchoolShellPageState extends State<SchoolShellPage> {
         SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
       );
   }
+
+  void _updateUi(VoidCallback fn) {
+    if (!mounted) return;
+    setState(fn);
+  }
 }
 
 
