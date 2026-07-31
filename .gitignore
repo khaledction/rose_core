@@ -1,0 +1,82 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+*~
+.DS_Store
+Thumbs.db
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# Editor / IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+# .vscode/
+
+# Local backup / temp editor files (never commit)
+*.bak
+*.bak_*
+*.orig
+*.tmp
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Project-generated archives and local-only packages
+/backups/
+/preview_only_package/
+/ROSE_SCHOOL_DESKTOP_READY_PACKAGE/
+/tmp_updates/
+*.zip
+
+# Secrets / local env (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.key
+secrets/
+credentials/
+
+# Local docs/previews that must not re-enter the repo
+/mockups/
+/reference/
+/FULL_PROJECT_DEMO.html
+/PROJECT_COMPREHENSIVE_INTERACTIVE_PREVIEW.html
+/SECRETARIAT_FULL_INTERACTIVE.html
+/PHASE_2_VISUAL_SHOWCASE.html
+*.bak
+/tmp_updates/
+/dist/
+
+# Downloaded redistributables (fetched at build time)
+/installer/redist/*.exe
+/dist/
+
