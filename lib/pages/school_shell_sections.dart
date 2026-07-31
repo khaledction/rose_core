@@ -13208,16 +13208,16 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
     // left -> right widths matching children order above
     const colWidths = <int, TableColumnWidth>{
-      0: FlexColumnWidth(1.22), // المحصلة (يسار) - موسع قليلا
-      1: FlexColumnWidth(1.12), // محصلة 2
-      2: FlexColumnWidth(1.10), // امتحان 2
-      3: FlexColumnWidth(1.10), // أعمال 2
-      4: FlexColumnWidth(1.12), // محصلة 1
-      5: FlexColumnWidth(1.10), // امتحان 1
-      6: FlexColumnWidth(1.10), // أعمال 1
-      7: FlexColumnWidth(1.35), // العظمى - موسع
-      8: FlexColumnWidth(1.35), // الدنيا - موسع
-      9: FlexColumnWidth(2.0), // المادة (يمين) - موسع قليلا
+      0: FlexColumnWidth(1.1), // المحصلة (يسار)
+      1: FlexColumnWidth(1.05), // محصلة 2
+      2: FlexColumnWidth(1.05), // امتحان 2
+      3: FlexColumnWidth(1.05), // أعمال 2
+      4: FlexColumnWidth(1.05), // محصلة 1
+      5: FlexColumnWidth(1.05), // امتحان 1
+      6: FlexColumnWidth(1.05), // أعمال 1
+      7: FlexColumnWidth(1.25), // العظمى
+      8: FlexColumnWidth(1.25), // الدنيا
+      9: FlexColumnWidth(1.75), // المادة (يمين)
     };
 
     // Fill the whole A4 sheet: no large empty whitespace.
@@ -13349,18 +13349,18 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 builder: (context, constraints) {
                   // Premium fix: fill A4 without large white space, keep official shape
                   final available = constraints.maxHeight;
-                  final headerH = 48.0;
-                  final totalsH = 36.0;
+                  final headerH = 42.0;
+                  final totalsH = 32.0;
                   final remainingForSubjects =
                       (available - (headerH * 2) - totalsH).clamp(
                         80.0,
                         available,
                       );
                   final subjectH = subjects.isEmpty
-                      ? 36.0
+                      ? 32.0
                       : (remainingForSubjects / subjects.length).clamp(
-                          32.0,
-                          100.0,
+                          28.0,
+                          90.0,
                         );
 
                   Widget cell(
@@ -13803,7 +13803,8 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
   }) {
     return Container(
       color: cellColor ?? Colors.transparent,
-      padding: EdgeInsets.symmetric(horizontal: isHeader ? 6 : 7, vertical: isHeader ? 12 : 14),
+      // Fill A4 height: taller cells reduce empty whitespace under the table.
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       alignment: Alignment.center,
       child: Text(
         text,
