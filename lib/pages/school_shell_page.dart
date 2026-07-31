@@ -246,6 +246,7 @@ class _SchoolShellPageState extends State<SchoolShellPage> {
   final TextEditingController _transportMonthlyController = TextEditingController(text: '5000');
   final TextEditingController _transportAnnualController = TextEditingController(text: '50000');
   final TextEditingController _transportGrantController = TextEditingController(text: '25000');
+  final TextEditingController _transportInstallmentCountController = TextEditingController(text: '10');
   final TextEditingController _exemptionMonthsController = TextEditingController(text: '3');
   String _installmentCurrency = 'ليرة سورية';
   String _exemptionScope = 'الكل'; // الكل | الصف | الصف والشعبة | الطالب
@@ -2587,6 +2588,7 @@ class _SchoolShellPageState extends State<SchoolShellPage> {
       _transportMonthlyController,
       _transportAnnualController,
       _transportGrantController,
+      _transportInstallmentCountController,
       _exemptionMonthsController,
       _loginUsernameController,
       _loginPasswordController,
