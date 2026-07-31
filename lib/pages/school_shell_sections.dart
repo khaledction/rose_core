@@ -6228,7 +6228,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     int selectedStudentId = student.id;
 
     String emoji = '💵';
-    String title = 'قسط عادي';
+    String title = 'القسط الشهري';
     String note = '';
     double unitAmount = 0;
 
@@ -6257,7 +6257,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     switch (presetType) {
       case 'normal':
         emoji = '💵';
-        title = 'قسط عادي';
+        title = 'القسط الشهري';
         unitAmount = monthly;
         note = 'كل ضغطة تضيف قسطًا واحدًا فقط بالقيمة المحددة من الإدارة.';
         break;
@@ -6267,13 +6267,6 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
         unitAmount = transportMonthly;
         note =
             'كل ضغطة تضيف قسط المواصلات الشهري فقط من اعتماد الإدارة، دون جمعه مع القسط الشهري العادي.';
-        break;
-      case 'grant':
-        emoji = '💵🚌🎁';
-        title = 'قسط مع منحة مواصلات';
-        unitAmount = monthly + grantAmount;
-        note =
-            'كل ضغطة تضيف قسطًا واحدًا = (قسط شهري + منحة مواصلات). إعفاء $exemptionMonths شهراً من الإدارة.';
         break;
     }
 
@@ -8240,13 +8233,8 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     ? const Color(0xFFE7F7EE)
                     : null,
                 helperText: annualPaidInFull
-                    ? 'تم استيفاء كامل القسط السنوي'
+                    ? 'تم استيفاء الرسم كاملا'
                     : null,
-              ),
-              _accountingSummaryBox(
-                'القسط الشهري',
-                monthlyAmount.toStringAsFixed(0),
-                AppPalette.leafGreen,
               ),
               _accountingSummaryBox(
                 'الباقي',
@@ -8254,6 +8242,11 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 remainingAmount <= 0
                     ? AppPalette.royalBlue
                     : AppPalette.roseRed,
+              ),
+              _accountingSummaryBox(
+                'القسط الشهري',
+                monthlyAmount.toStringAsFixed(0),
+                AppPalette.leafGreen,
               ),
               _accountingSummaryBox(
                 'قسط المواصلات',
@@ -13215,16 +13208,16 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
     // left -> right widths matching children order above
     const colWidths = <int, TableColumnWidth>{
-      0: FlexColumnWidth(1.1), // المحصلة (يسار)
-      1: FlexColumnWidth(1.05), // محصلة 2
-      2: FlexColumnWidth(1.05), // امتحان 2
-      3: FlexColumnWidth(1.05), // أعمال 2
-      4: FlexColumnWidth(1.05), // محصلة 1
-      5: FlexColumnWidth(1.05), // امتحان 1
-      6: FlexColumnWidth(1.05), // أعمال 1
-      7: FlexColumnWidth(1.25), // العظمى
-      8: FlexColumnWidth(1.25), // الدنيا
-      9: FlexColumnWidth(1.75), // المادة (يمين)
+      0: FlexColumnWidth(1.22), // المحصلة (يسار) - موسع قليلا
+      1: FlexColumnWidth(1.12), // محصلة 2
+      2: FlexColumnWidth(1.10), // امتحان 2
+      3: FlexColumnWidth(1.10), // أعمال 2
+      4: FlexColumnWidth(1.12), // محصلة 1
+      5: FlexColumnWidth(1.10), // امتحان 1
+      6: FlexColumnWidth(1.10), // أعمال 1
+      7: FlexColumnWidth(1.35), // العظمى - موسع
+      8: FlexColumnWidth(1.35), // الدنيا - موسع
+      9: FlexColumnWidth(2.0), // المادة (يمين) - موسع قليلا
     };
 
     // Fill the whole A4 sheet: no large empty whitespace.
@@ -13356,18 +13349,18 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 builder: (context, constraints) {
                   // Premium fix: fill A4 without large white space, keep official shape
                   final available = constraints.maxHeight;
-                  final headerH = 42.0;
-                  final totalsH = 32.0;
+                  final headerH = 48.0;
+                  final totalsH = 36.0;
                   final remainingForSubjects =
                       (available - (headerH * 2) - totalsH).clamp(
                         80.0,
                         available,
                       );
                   final subjectH = subjects.isEmpty
-                      ? 32.0
+                      ? 36.0
                       : (remainingForSubjects / subjects.length).clamp(
-                          28.0,
-                          90.0,
+                          32.0,
+                          100.0,
                         );
 
                   Widget cell(
@@ -13810,8 +13803,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
   }) {
     return Container(
       color: cellColor ?? Colors.transparent,
-      // Fill A4 height: taller cells reduce empty whitespace under the table.
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: isHeader ? 6 : 7, vertical: isHeader ? 12 : 14),
       alignment: Alignment.center,
       child: Text(
         text,
