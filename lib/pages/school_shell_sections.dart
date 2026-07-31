@@ -312,7 +312,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       'العملة',
                       _installmentCurrency,
                       const <String>['ليرة سورية', 'دولار', 'يورو'],
-                      (value) => _updateUi(() => _installmentCurrency = value),
+                      (value) => setState(() => _installmentCurrency = value),
                     ),
                   ],
                 ),
@@ -333,7 +333,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       const Color(0xFF667586),
                       () {
                         _loadInstallmentConfig().then((_) {
-                          if (mounted) _updateUi(() {});
+                          if (mounted) setState(() {});
                         });
                       },
                     ),
@@ -419,7 +419,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                         'المحاسبة': _adminPermissionsDraft.contains('المحاسبة'),
                       },
                       (permission) {
-                        _updateUi(() {
+                        setState(() {
                           if (_adminPermissionsDraft.contains(permission)) {
                             _adminPermissionsDraft.remove(permission);
                           } else {
@@ -484,7 +484,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: () {
-                          _updateUi(() {
+                          setState(() {
                             _loadAdminDraft(user);
                           });
                         },
@@ -646,7 +646,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                                 final student = _filteredStudents[index];
                                 return InkWell(
                                   onTap: () {
-                                    _updateUi(() {
+                                    setState(() {
                                       _loadStudent(student);
                                       _currentPage = 'form';
                                     });
@@ -810,7 +810,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       )
                       .toList(),
                   onChanged: (v) {
-                    _updateUi(() {
+                    setState(() {
                       _studentsStatsGrade = v ?? 'الكل';
                       _studentsStatsSection = 'الكل';
                     });
@@ -849,7 +849,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       )
                       .toList(),
                   onChanged: (v) =>
-                      _updateUi(() => _studentsStatsSection = v ?? 'الكل'),
+                      setState(() => _studentsStatsSection = v ?? 'الكل'),
                 ),
               ),
             ],
@@ -1272,7 +1272,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
           color: AppPalette.deepNavySoft,
           tooltip: 'معرفة ما تريد عن الطالب',
           onTap: () {
-            _updateUi(() => _loadStudent(student));
+            setState(() => _loadStudent(student));
             _showStudentKnowledgeDialog(student);
           },
         ),
@@ -1281,7 +1281,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
           color: AppPalette.goldDark,
           tooltip: 'فتح استمارة الطالب للتعديل',
           onTap: () {
-            _updateUi(() {
+            setState(() {
               _loadStudent(student);
               _currentPage = 'form';
             });
@@ -1292,7 +1292,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
           color: AppPalette.royalBlue,
           tooltip: 'فتح الوثائق والمرفقات',
           onTap: () {
-            _updateUi(() {
+            setState(() {
               _loadStudent(student);
               _currentPage = 'documents';
             });
@@ -1310,7 +1310,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
             ),
           ),
           onTap: () {
-            _updateUi(() {
+            setState(() {
               _loadStudent(student);
               _currentPage = 'student_card';
             });
@@ -1344,7 +1344,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   'R': _firstLanguage == 'R',
                   'أخرى': _firstLanguage == 'أخرى',
                 },
-                (key) => _updateUi(() => _firstLanguage = key),
+                (key) => setState(() => _firstLanguage = key),
                 span2: true,
               ),
               _choiceField(
@@ -1355,7 +1355,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   'R': _secondLanguage == 'R',
                   'أخرى': _secondLanguage == 'أخرى',
                 },
-                (key) => _updateUi(() => _secondLanguage = key),
+                (key) => setState(() => _secondLanguage = key),
                 span2: true,
               ),
               _choiceField(
@@ -1366,7 +1366,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   'R': _spokenLanguage == 'R',
                   'أخرى': _spokenLanguage == 'أخرى',
                 },
-                (key) => _updateUi(() => _spokenLanguage = key),
+                (key) => setState(() => _spokenLanguage = key),
                 span2: true,
               ),
               if (_firstLanguage == 'أخرى')
@@ -1401,7 +1401,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   'طالب جديد': _enrollmentType == 'طالب جديد',
                   'طالب منقول': _enrollmentType == 'طالب منقول',
                 },
-                (key) => _updateUi(() {
+                (key) => setState(() {
                   _enrollmentType = key;
                   if (key == 'طالب جديد') {
                     _failedGradesSelected.clear();
@@ -1438,7 +1438,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       for (var i = 1; i <= 12; i++)
                         '$i': _enrollmentGrade == '$i',
                     },
-                    (key) => _updateUi(() {
+                    (key) => setState(() {
                       _enrollmentGrade = key;
                       final n = int.tryParse(key) ?? 0;
                       if (n < 10 || n > 12) {
@@ -1461,7 +1461,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       for (var i = 1; i <= 10; i++)
                         '$i': _sectionController.text == '$i',
                     },
-                    (key) => _updateUi(() => _sectionController.text = key),
+                    (key) => setState(() => _sectionController.text = key),
                   ),
                 ],
               ),
@@ -1474,7 +1474,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'علمي': _secondaryTrack == 'علمي',
                     'أدبي': _secondaryTrack == 'أدبي',
                   },
-                  (key) => _updateUi(() {
+                  (key) => setState(() {
                     _secondaryTrack = key;
                     _gradeController.text = _composeStudentGradeLabel();
                   }),
@@ -1500,7 +1500,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       '$i': _failedGradesSelected.contains('$i'),
                   },
                   (key) {
-                    _updateUi(() {
+                    setState(() {
                       if (_failedGradesSelected.contains(key)) {
                         _failedGradesSelected.remove(key);
                       } else {
@@ -1543,7 +1543,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 'مشترك بوسائل نقل المدرسة',
                 _transportSubscription,
                 const <String>['نعم', 'لا', 'معفى من رسوم النقل'],
-                (v) => _updateUi(() => _transportSubscription = v),
+                (v) => setState(() => _transportSubscription = v),
                 span2: true,
               ),
               if (_transportSubscription == 'نعم' ||
@@ -1584,7 +1584,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   'يعيش في مكان مفصل عن العائلة': _livesSeparate,
                 },
                 (key) {
-                  _updateUi(() {
+                  setState(() {
                     if (key == 'حياة طبيعية') _normalLife = !_normalLife;
                     if (key == 'يتيم الأب') _orphanFather = !_orphanFather;
                     if (key == 'يتيم الأم') _orphanMother = !_orphanMother;
@@ -1610,7 +1610,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 'الحالة الصحية',
                 _healthStatus,
                 const <String>['سليم', 'مرض عضوي', 'حالة نفسية', 'إعاقة'],
-                (v) => _updateUi(() {
+                (v) => setState(() {
                   _healthStatus = v;
                   if (v != 'إعاقة') {
                     _disabilityVisual = false;
@@ -1635,7 +1635,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'تعلم': _disabilityLearning,
                   },
                   (key) {
-                    _updateUi(() {
+                    setState(() {
                       if (key == 'بصرية')
                         _disabilityVisual = !_disabilityVisual;
                       if (key == 'سمعية')
@@ -1669,7 +1669,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   'رياضة': _hobbySports,
                 },
                 (key) {
-                  _updateUi(() {
+                  setState(() {
                     if (key == 'موسيقا') _hobbyMusic = !_hobbyMusic;
                     if (key == 'رسم') _hobbyDrawing = !_hobbyDrawing;
                     if (key == 'كمبيوتر') _hobbyComputer = !_hobbyComputer;
@@ -1687,7 +1687,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   'اختراعات ومشاريع': _initiativeProjects,
                 },
                 (key) {
-                  _updateUi(() {
+                  setState(() {
                     if (key == 'مدرسية') _initiativeSchool = !_initiativeSchool;
                     if (key == 'مالية')
                       _initiativeFinancial = !_initiativeFinancial;
@@ -2259,7 +2259,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
       final mm = picked.month.toString().padLeft(2, '0');
       final dd = picked.day.toString().padLeft(2, '0');
       controller.text = '${picked.year}-$mm-$dd';
-      _updateUi(() {});
+      setState(() {});
     }
   }
 
@@ -2326,7 +2326,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
               return Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: InkWell(
-                  onTap: () => _updateUi(() => _bloodType = type),
+                  onTap: () => setState(() => _bloodType = type),
                   borderRadius: BorderRadius.circular(999),
                   child: Container(
                     height: 32,
@@ -2377,7 +2377,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
             Expanded(
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () => _updateUi(() => _gender = 'ذكر'),
+                onTap: () => setState(() => _gender = 'ذكر'),
                 child: Container(
                   height: double.infinity,
                   alignment: Alignment.center,
@@ -2404,7 +2404,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
             Expanded(
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () => _updateUi(() => _gender = 'أنثى'),
+                onTap: () => setState(() => _gender = 'أنثى'),
                 child: Container(
                   height: double.infinity,
                   alignment: Alignment.center,
@@ -2461,7 +2461,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
                 .toList(),
             onChanged: (v) {
-              if (v != null) _updateUi(() => _religionController.text = v);
+              if (v != null) setState(() => _religionController.text = v);
             },
           ),
         ),
@@ -2507,7 +2507,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
             borderRadius: BorderRadius.circular(18),
             hoverColor: const Color.fromRGBO(201, 160, 78, 0.12),
             onTap: () {
-              _updateUi(() {
+              setState(() {
                 if (active) {
                   _openSections.remove(id);
                 } else {
@@ -3698,7 +3698,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                               final selected = _students.firstWhere(
                                 (s) => s.id == value,
                               );
-                              _updateUi(() => _loadStudent(selected));
+                              setState(() => _loadStudent(selected));
                             },
                           ),
                         ],
@@ -4488,7 +4488,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'تحديث القائمة',
                     const Color(0xFFEDF6FF),
                     const Color(0xFF24436F),
-                    () => _updateUi(() {}),
+                    () => setState(() {}),
                   ),
                   _actionButton(
                     'تصدير Excel',
@@ -4536,7 +4536,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       'الحالة',
                       _attendanceStatus,
                       const <String>['حاضر', 'غائب', 'متأخر', 'مأذون'],
-                      (v) => _updateUi(() => _attendanceStatus = v),
+                      (v) => setState(() => _attendanceStatus = v),
                     ),
                     _dateFieldCard('تاريخ التسجيل', _attendanceDateController),
                     _editableField(
@@ -4599,7 +4599,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                           ),
                           IconButton(
                             onPressed: () {
-                              _updateUi(() => _attendance.remove(entry));
+                              setState(() => _attendance.remove(entry));
                               _showSnack('تم حذف سجل الحضور/الغياب بنجاح.');
                             },
                             icon: const Icon(
@@ -4670,7 +4670,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
               onChanged: (value) {
                 if (value == null) return;
                 final selected = _students.firstWhere((s) => s.id == value);
-                _updateUi(() {
+                setState(() {
                   _examCycleOverride =
                       null; // auto model from the new student's grade
                   _loadStudent(selected);
@@ -5162,7 +5162,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                         _showSnack('أضف قالب دفع واحدًا على الأقل قبل الحفظ.');
                         return;
                       }
-                      _updateUi(() {
+                      setState(() {
                         for (final draft in validDrafts) {
                           final info =
                               (draft['infoController'] as TextEditingController)
@@ -5225,7 +5225,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       quantity: quantityController.text.trim(),
                       note: noteController.text.trim(),
                     );
-                    _updateUi(() => _accountingDonations.insert(0, entry));
+                    setState(() => _accountingDonations.insert(0, entry));
                     _persistAll();
                     Navigator.pop(dialogContext);
                     _showSnack('تم حفظ التبرع بنجاح.');
@@ -5242,7 +5242,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                               selectedEntry!,
                             );
                             if (index >= 0) {
-                              _updateUi(() {
+                              setState(() {
                                 _accountingDonations[index] =
                                     AccountingDonationEntry(
                                       studentId: selectedEntry!.studentId,
@@ -5294,7 +5294,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                             selectedEntry!,
                           );
                           if (index >= 0) {
-                            _updateUi(() {
+                            setState(() {
                               _accountingDonations[index] =
                                   AccountingDonationEntry(
                                     studentId: selectedEntry!.studentId,
@@ -5327,7 +5327,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   onPressed: selectedEntry == null
                       ? null
                       : () {
-                          _updateUi(
+                          setState(
                             () => _accountingDonations.remove(selectedEntry),
                           );
                           _persistAll();
@@ -5757,7 +5757,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                         _showSnack('أضف قالب دفع واحدًا على الأقل قبل الحفظ.');
                         return;
                       }
-                      _updateUi(() {
+                      setState(() {
                         for (final draft in validDrafts) {
                           final info =
                               (draft['infoController'] as TextEditingController)
@@ -5820,7 +5820,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       quantity: quantityController.text.trim(),
                       note: noteController.text.trim(),
                     );
-                    _updateUi(() => _accountingAids.insert(0, entry));
+                    setState(() => _accountingAids.insert(0, entry));
                     _persistAll();
                     Navigator.pop(dialogContext);
                     _showSnack('تم حفظ المساعدة بنجاح.');
@@ -5837,7 +5837,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                               selectedEntry!,
                             );
                             if (index >= 0) {
-                              _updateUi(() {
+                              setState(() {
                                 _accountingAids[index] = AccountingAidEntry(
                                   studentId: selectedEntry!.studentId,
                                   title:
@@ -5886,7 +5886,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
                           final index = _accountingAids.indexOf(selectedEntry!);
                           if (index >= 0) {
-                            _updateUi(() {
+                            setState(() {
                               _accountingAids[index] = AccountingAidEntry(
                                 studentId: selectedEntry!.studentId,
                                 title:
@@ -5916,7 +5916,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   onPressed: selectedEntry == null
                       ? null
                       : () {
-                          _updateUi(
+                          setState(
                             () => _accountingAids.remove(selectedEntry),
                           );
                           _persistAll();
@@ -6523,7 +6523,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                                 .toIso8601String()
                                 .split('T')
                                 .first;
-                            _updateUi(() {
+                            setState(() {
                               _selectedStudentId = selectedStudentId;
                               // Keep invoice history
                               _invoices.insert(
@@ -6581,7 +6581,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                               Navigator.of(dialogContext).pop();
                             }
                             if (mounted) {
-                              _updateUi(() {});
+                              setState(() {});
                               final left = maxCount - nextIndex;
                               _showSnack(
                                 left > 0
@@ -6752,7 +6752,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                           orElse: () => _students.first,
                         )
                         .fullName;
-                    _updateUi(() {
+                    setState(() {
                       _receipts.insert(
                         0,
                         AccountingReceiptEntry(
@@ -6795,7 +6795,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       stillOverdue,
                     );
                     if (mounted) {
-                      _updateUi(() {
+                      setState(() {
                         _accountingView = 'dues';
                         _accountingFilterStudentId = selectedStudentId;
                       });
@@ -7614,7 +7614,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     final active = _accountingView == id;
     return InkWell(
       borderRadius: BorderRadius.circular(24),
-      onTap: () => _updateUi(() {
+      onTap: () => setState(() {
         if (_accountingView == id) {
           _accountingView = '';
         } else {
@@ -8192,7 +8192,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     const Color(0xFFF7F3EA),
                     AppPalette.goldDark,
                     () {
-                      _updateUi(() => _accountingView = 'installments');
+                      setState(() => _accountingView = 'installments');
                       _showInstallmentPresetDialog(presetType: 'normal');
                     },
                   ),
@@ -8201,7 +8201,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     const Color(0xFFEDF6FF),
                     AppPalette.royalBlue,
                     () {
-                      _updateUi(
+                      setState(
                         () => _accountingView = 'transport_installments',
                       );
                       _showInstallmentPresetDialog(presetType: 'transport');
@@ -8386,7 +8386,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                         ],
                         onChanged: (value) {
                           if (value == null) return;
-                          _updateUi(() {
+                          setState(() {
                             if (value == 'all') {
                               _accountingFilterStudentId = null;
                             } else {
@@ -8422,7 +8422,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                               .take(20);
                         },
                         onSelected: (student) {
-                          _updateUi(() {
+                          setState(() {
                             _accountingFilterStudentId = student.id;
                             _accountingStudentSearch = student.fullName;
                             _accountingStudentSearchController.text =
@@ -8466,7 +8466,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                                           icon: const Icon(Icons.clear),
                                           onPressed: () {
                                             controller.clear();
-                                            _updateUi(() {
+                                            setState(() {
                                               _accountingStudentSearch = '';
                                               _accountingStudentSearchController
                                                   .clear();
@@ -8476,7 +8476,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                                         ),
                                 ),
                                 onChanged: (value) {
-                                  _updateUi(() {
+                                  setState(() {
                                     _accountingStudentSearch = value;
                                     _accountingStudentSearchController.text =
                                         value;
@@ -8568,7 +8568,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                             .toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            _updateUi(() => _accountingGradeFilter = value);
+                            setState(() => _accountingGradeFilter = value);
                           }
                         },
                       ),
@@ -8614,7 +8614,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                             .toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            _updateUi(() => _accountingSectionFilter = value);
+                            setState(() => _accountingSectionFilter = value);
                           }
                         },
                       ),
@@ -8829,7 +8829,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'تحديث القائمة',
                     const Color(0xFFEDF6FF),
                     const Color(0xFF24436F),
-                    () => _updateUi(() {}),
+                    () => setState(() {}),
                   ),
                 ],
               ),
@@ -8889,7 +8889,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                           final selected = _students.firstWhere(
                             (s) => s.id == value,
                           );
-                          _updateUi(() => _loadStudent(selected));
+                          setState(() => _loadStudent(selected));
                         },
                       ),
                     ],
@@ -9011,7 +9011,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'تحديث القائمة',
                     const Color(0xFFEDF6FF),
                     const Color(0xFF24436F),
-                    () => _updateUi(() {}),
+                    () => setState(() {}),
                   ),
                 ],
               ),
@@ -9132,7 +9132,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     final now = DateTime.now();
     final stamp =
         '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
-    _updateUi(() {
+    setState(() {
       _backups.insert(
         0,
         BackupEntry(
@@ -9150,7 +9150,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
   void _addDemoAttendance() {
     final student = _selectedStudent ?? _students.first;
-    _updateUi(() {
+    setState(() {
       _attendance.insert(
         0,
         AttendanceEntry(
@@ -9202,7 +9202,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 'تحديث العرض',
                 const Color(0xFFEDF6FF),
                 const Color(0xFF24436F),
-                () => _updateUi(() {}),
+                () => setState(() {}),
               ),
             ],
           ),
@@ -9390,7 +9390,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'تحديث القائمة',
                     const Color(0xFFEDF6FF),
                     const Color(0xFF24436F),
-                    () => _updateUi(() {}),
+                    () => setState(() {}),
                   ),
                 ],
               ),
@@ -9461,7 +9461,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                           ),
                           IconButton(
                             onPressed: () {
-                              _updateUi(() => _messages.remove(message));
+                              setState(() => _messages.remove(message));
                               _showSnack('تم حذف المراسلة بنجاح.');
                             },
                             icon: const Icon(
@@ -9515,7 +9515,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'تحديث القائمة',
                     const Color(0xFFEDF6FF),
                     const Color(0xFF24436F),
-                    () => _updateUi(() {}),
+                    () => setState(() {}),
                   ),
                 ],
               ),
@@ -9552,7 +9552,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       'نوع الإجراء',
                       _disciplineType,
                       const <String>['مكافأة', 'عقوبة'],
-                      (v) => _updateUi(() => _disciplineType = v),
+                      (v) => setState(() => _disciplineType = v),
                     ),
                     _dateFieldCard('تاريخ الإجراء', _disciplineDateController),
                     _editableField('السبب', _disciplineTitleController),
@@ -9607,7 +9607,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                           ),
                           IconButton(
                             onPressed: () {
-                              _updateUi(() => _discipline.remove(entry));
+                              setState(() => _discipline.remove(entry));
                               _showSnack('تم حذف الإجراء بنجاح.');
                             },
                             icon: const Icon(
@@ -9661,7 +9661,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     'تحديث القائمة',
                     const Color(0xFFEDF6FF),
                     const Color(0xFF24436F),
-                    () => _updateUi(() {}),
+                    () => setState(() {}),
                   ),
                   _actionButton(
                     'تصدير شهادة PDF',
@@ -9709,7 +9709,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                         'بيان نجاح',
                         'شهادة أخرى',
                       ],
-                      (v) => _updateUi(() => _certificateKind = v),
+                      (v) => setState(() => _certificateKind = v),
                     ),
                     if (_certificateKind == 'شهادة أخرى')
                       _editableField(
@@ -9781,7 +9781,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                           ),
                           IconButton(
                             onPressed: () {
-                              _updateUi(() => _certificates.remove(entry));
+                              setState(() => _certificates.remove(entry));
                               _showSnack('تم حذف الشهادة بنجاح.');
                             },
                             icon: const Icon(
@@ -10399,7 +10399,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     }
                     return;
                   }
-                  _updateUi(() {
+                  setState(() {
                     final idx = _customExamSubjects.indexOf(selected);
                     if (idx >= 0) {
                       _customExamSubjects[idx] = newName;
@@ -10445,7 +10445,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   }
                   _showSnack('تم تعديل اسم المادة إلى "$newName".');
                 } else {
-                  _updateUi(() {
+                  setState(() {
                     _customExamSubjects = _customExamSubjects
                         .where((s) => s != selected)
                         .toList();
@@ -10651,7 +10651,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
       _showSnack('المادة موجودة مسبقًا ضمن الخيارات.');
       return;
     }
-    _updateUi(() {
+    setState(() {
       _customExamSubjects = <String>[..._customExamSubjects, name];
     });
     await _persistAll();
@@ -10986,7 +10986,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       }
                     }
 
-                    _updateUi(() {
+                    setState(() {
                       _messages.insert(
                         0,
                         ParentMessageEntry(
@@ -11065,7 +11065,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
   void _addDemoDiscipline() {
     final student = _selectedStudent ?? _students.first;
-    _updateUi(() {
+    setState(() {
       _discipline.insert(
         0,
         DisciplineEntry(
@@ -11090,7 +11090,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
   void _addDemoCertificate() {
     final student = _selectedStudent ?? _students.first;
-    _updateUi(() {
+    setState(() {
       _certificates.insert(
         0,
         CertificateEntry(
@@ -11116,7 +11116,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
   void _addDemoInvoice() {
     final student = _selectedStudent ?? _students.first;
-    _updateUi(() {
+    setState(() {
       _invoices.insert(
         0,
         AccountingInvoiceEntry(
@@ -11140,7 +11140,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
   void _addDemoReceipt() {
     final student = _selectedStudent ?? _students.first;
-    _updateUi(() {
+    setState(() {
       _receipts.insert(
         0,
         AccountingReceiptEntry(
@@ -11867,7 +11867,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
       _showSnack('لا توجد مواد لهذا الطالب لتدقيقها.');
       return;
     }
-    _updateUi(() {
+    setState(() {
       for (final subject in subjects) {
         final index = _examResults.indexWhere(
           (item) => item.studentId == student.id && item.subject == subject,
@@ -12014,7 +12014,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     final index = _examResults.indexWhere(
       (item) => item.studentId == student.id && item.subject == subject,
     );
-    _updateUi(() {
+    setState(() {
       if (index >= 0) {
         _examResults[index] = entry;
       } else {
@@ -14077,7 +14077,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                                           Duration.zero,
                                         );
                                         if (!mounted) return;
-                                        _updateUi(() => _loadStudent(student));
+                                        setState(() => _loadStudent(student));
                                         await WidgetsBinding
                                             .instance
                                             .endOfFrame;
@@ -14098,7 +14098,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                                           Duration.zero,
                                         );
                                         if (!mounted) return;
-                                        _updateUi(() => _loadStudent(student));
+                                        setState(() => _loadStudent(student));
                                         await WidgetsBinding
                                             .instance
                                             .endOfFrame;
@@ -14267,7 +14267,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       Icons.refresh,
                       AppPalette.sky,
                       AppPalette.deepNavySoft,
-                      () => _updateUi(() {}),
+                      () => setState(() {}),
                     ),
                     _examActionChip(
                       'إدارة المواد',
@@ -14302,7 +14302,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       _showOnlyUnreviewedExamSubjects
                           ? Colors.white
                           : AppPalette.deepNavySoft,
-                      () => _updateUi(
+                      () => setState(
                         () => _showOnlyUnreviewedExamSubjects =
                             !_showOnlyUnreviewedExamSubjects,
                       ),
@@ -14413,7 +14413,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                                   .toList(),
                               onChanged: (value) {
                                 if (value == null) return;
-                                _updateUi(() {
+                                setState(() {
                                   final auto = _detectExamCycleForStudent(
                                     student,
                                   );
