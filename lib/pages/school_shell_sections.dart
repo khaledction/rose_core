@@ -13629,20 +13629,20 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // تصغير ثاني 1/8 + زيادة خط بمقدار 2
+                  // إصلاح نهائي جذري: إلغاء FittedBox + عرض A4 كامل بدون تصغير - بلا تشويه نهائياً
                   final available = constraints.maxHeight;
-                  final headerH = 23.0;
-                  final totalsH = 19.0;
+                  final headerH = 32.0;
+                  final totalsH = 28.0;
                   final remainingForSubjects =
                       (available - (headerH * 2) - totalsH).clamp(
-                        60.0,
+                        80.0,
                         available,
                       );
                   final subjectH = subjects.isEmpty
-                      ? 34.0
+                      ? 42.0
                       : (remainingForSubjects / subjects.length).clamp(
-                          26.0,
-                          60.0,
+                          32.0,
+                          58.0,
                         );
 
                   Widget cell(
@@ -14093,8 +14093,8 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
   }) {
     return Container(
       color: cellColor ?? Colors.transparent,
-      // زيادة بمقدار 2 للدرجات فقط (الارقام) + تصغير ثاني 1/8
-      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+      // نهائي بلا تشويه: خط 14/13.5 مع ارتفاع متوازن
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
       alignment: Alignment.center,
       child: Text(
         text,
@@ -14893,11 +14893,8 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                         .toList(),
                   ),
                 const SizedBox(height: 18),
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: _SchoolShellPageState._examReportCardWidth,
-                    ),
+                SingleChildScrollView(
+                  child: Center(
                     child: RepaintBoundary(
                       key: _examReportBoundaryKey,
                       child: _examReportCard(student, subjects),
