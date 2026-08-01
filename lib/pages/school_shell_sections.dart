@@ -11264,6 +11264,100 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     return 0;
   }
 
+
+  String _abbrevGradeSectionDisplay(StudentRecord student) {
+    final gradeNum = _studentGradeNumber(student);
+    final gradeDisp = _studentGradeDisplay(student).trim();
+    final secDisp = _studentSectionDisplay(student).trim();
+    // محاولة اختصار أنيق مقروء: التاسع - الأولى أو 9/1
+    String secShort = secDisp;
+    // تحويل الشعب الشائعة إلى أرقام أو اختصار
+    final secLower = secDisp.replaceAll('أ', 'ا').replaceAll('إ', 'ا');
+    if (secLower.contains('الاولى') || secLower.toLowerCase().contains('الاولى') || secDisp == '1' || secLower.contains('أولى')) {
+      secShort = 'الأولى';
+    } else if (secLower.contains('الثانيه') || secLower.contains('الثانية') || secDisp == '2') {
+      secShort = 'الثانية';
+    } else if (secLower.contains('الثالثه') || secLower.contains('الثالثة')) {
+      secShort = 'الثالثة';
+    }
+    // إذا الطول كبير، استخدم رقمي: 9/1
+    final combined = '$gradeDisp - $secShort';
+    if (combined.length > 14) {
+      // استخدم رقم الصف مع الشعبة: 9/1 أو 9 - الأولى مختصر
+      final secNum = _sectionToNumber(secDisp);
+      if (secNum > 0) {
+        return '$gradeNum/$secNum';
+      }
+      // fallback اختصار: التاسع - الأولى -> التاسع-الأولى (بدون مسافات)
+      return '${gradeDisp}-${secShort}'.replaceAll('  ', ' ').trim();
+    }
+    return combined;
+  }
+
+  int _sectionToNumber(String sec) {
+    final s = sec.trim().toLowerCase().replaceAll('أ', 'ا').replaceAll('إ', 'ا');
+    if (s.contains('الاولى') || s == '1' || s.contains('اولى')) return 1;
+    if (s.contains('الثانيه') || s.contains('الثانية') || s == '2' || s.contains('ثانيه') || s.contains('ثانية')) return 2;
+    if (s.contains('الثالثه') || s.contains('الثالثة') || s == '3') return 3;
+    if (s.contains('الرابعه') || s.contains('الرابعة') || s == '4') return 4;
+    if (s.contains('الخامسه') || s.contains('الخامسة') || s == '5') return 5;
+    // حاول استخراج رقم مباشر
+    final digitMatch = RegExp(r'(\d+)').firstMatch(s);
+    if (digitMatch != null) {
+      return int.tryParse(digitMatch.group(1)!) ?? 0;
+    }
+    return 0;
+  }
+
+  String _readableGradeDisplay(StudentRecord student) {
+    final gradeNum = _studentGradeNumber(student);
+    final isLit = _studentIsLiteraryTrack(student);
+    final isSci = _studentIsScientificTrack(student);
+    final rawDisp = _studentGradeDisplay(student).trim();
+
+    // طريقة مناسبة مقروءة وواضحة ومختصرة
+    if (gradeNum >= 1 && gradeNum <= 9) {
+      // للأول حتى التاسع: استخدم الكلمة العربية القصيرة
+      const map = {
+        1: 'الأول', 2: 'الثاني', 3: 'الثالث', 4: 'الرابع',
+        5: 'الخامس', 6: 'السادس', 7: 'السابع', 8: 'الثامن', 9: 'التاسع',
+      };
+      return map[gradeNum] ?? rawDisp;
+    }
+    // ثانوي: استخدم رقم + فرع مختصر: 10 أدبي، 12 علمي
+    if (gradeNum == 10) return isLit ? '10 أدبي' : '10 علمي';
+    if (gradeNum == 11) return isLit ? '11 أدبي' : '11 علمي';
+    if (gradeNum == 12) return isLit ? '12 أدبي' : '12 علمي';
+    // fallback: اختصر العبارة الطويلة
+    if (rawDisp.length > 16) {
+      if (gradeNum > 0) {
+        return isLit ? '$gradeNum أدبي' : (isSci ? '$gradeNum علمي' : '$gradeNum');
+      }
+      return rawDisp.substring(0, 14);
+    }
+    return rawDisp;
+  }
+
+  String _readableSectionDisplay(StudentRecord student) {
+    final secDisp = _studentSectionDisplay(student).trim();
+    final secNum = _sectionToNumber(secDisp);
+    if (secNum > 0 && secNum <= 5) {
+      const map = {1: 'الأولى', 2: 'الثانية', 3: 'الثالثة', 4: 'الرابعة', 5: 'الخامسة'};
+      // إذا كانت الشعبة رقمية فقط، أعد الكلمة العربية القصيرة المقروءة
+      // لكن إذا كانت القيمة الأصلية رقمية، أبقها رقمية مختصرة 1/2/3
+      if (secDisp.length <= 2) return secDisp;
+      return map[secNum] ?? secDisp;
+    }
+    if (secDisp.length > 10) {
+      // اختصر: الأولى -> 1
+      final num = _sectionToNumber(secDisp);
+      if (num > 0) return '$num';
+      return secDisp.substring(0, 8);
+    }
+    return secDisp.isEmpty ? '-' : secDisp;
+  }
+
+
   bool _studentIsScientificTrack(StudentRecord student) {
     final raw =
         '${student.grade} ${student.enrollmentGrade} ${_studentGradeDisplay(student)}'
@@ -11403,7 +11497,65 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
   }
 
   List<String> _defaultSubjectsForStudent(StudentRecord student) {
-    return _subjectsForExamCycle(_activeExamCycleForStudent(student));
+    final gradeNum = _studentGradeNumber(student);
+    final cycle = _activeExamCycleForStudent(student);
+    final isLit = _studentIsLiteraryTrack(student);
+    final isSci = _studentIsScientificTrack(student) || !isLit;
+
+    if (gradeNum == 9 && cycle == kExamCyclePrep) {
+      return <String>[
+        'اجتماعيات', 'التربية الدينية', 'التربية الرياضية', 'التربية الموسيقية',
+        'الرياضيات', 'العلوم العامة', 'الفنون الجمالية', 'اللغة الإنكليزية',
+        'اللغة الروسية', 'اللغة العربية', 'تكنلوجيا المعلومات والاتصالات',
+        'لغة تركية', 'لغة فرنسية',
+      ];
+    }
+
+    // ثانوي حسب القوالب الرسمية المرفقة - ضمن ورقة A4 واحدة
+    if (gradeNum == 10 && isLit) {
+      return <String>[
+        'التاريخ', 'التربية الدينية', 'التربية الرياضية', 'التربية الفنية',
+        'الجغرافيا', 'الرياضيات', 'الفلسفة والعلوم الإنسانية', 'اللغة الأجنبية',
+        'اللغة الإنكليزية', 'اللغة العربية', 'تكنلوجيا المعلومات والاتصالات', 'سلوك',
+      ];
+    }
+    if (gradeNum == 10 && isSci) {
+      return <String>[
+        'التربية الدينية', 'التربية الرياضية', 'التربية الفنية', 'الرياضيات',
+        'الفلسفة والعلوم الإنسانية', 'الفيزياء', 'الكيمياء', 'اللغة الأجنبية',
+        'اللغة الإنكليزية', 'اللغة العربية', 'تكنلوجيا المعلومات والاتصالات', 'سلوك', 'علم الأحياء',
+      ];
+    }
+    if (gradeNum == 11 && isLit) {
+      return <String>[
+        'التاريخ', 'التربية الدينية', 'التربية الرياضية', 'التربية الفنية',
+        'الجغرافيا', 'الرياضيات', 'الفلسفة والعلوم الإنسانية', 'اللغة الأجنبية',
+        'اللغة الإنكليزية', 'اللغة العربية', 'تكنلوجيا المعلومات والاتصالات', 'سلوك',
+      ];
+    }
+    if (gradeNum == 11 && isSci) {
+      return <String>[
+        'التربية الدينية', 'التربية الرياضية', 'الرياضيات', 'الفلسفة والعلوم الإنسانية',
+        'الفيزياء', 'الكيمياء', 'اللغة الأجنبية', 'اللغة الإنكليزية', 'اللغة العربية',
+        'تكنلوجيا المعلومات والاتصالات', 'سلوك', 'علم الأحياء',
+      ];
+    }
+    if (gradeNum == 12 && isLit) {
+      return <String>[
+        'التاريخ', 'التربية الدينية', 'التربية الرياضية', 'التربية الفنية',
+        'الجغرافيا', 'الفلسفة والعلوم الإنسانية', 'اللغة الإنكليزية', 'اللغة الروسية',
+        'اللغة العربية', 'لغة تركية', 'لغة فرنسية',
+      ];
+    }
+    if (gradeNum == 12 && isSci) {
+      return <String>[
+        'التربية الدينية', 'التربية الرياضية', 'الرياضيات', 'الفيزياء', 'الكيمياء',
+        'اللغة الإنكليزية', 'اللغة الروسية', 'اللغة العربية', 'علم الأحياء',
+        'لغة تركية', 'لغة فرنسية',
+      ];
+    }
+
+    return _subjectsForExamCycle(cycle);
   }
 
   void _appendExamSubject(List<String> subjects, String subject) {
@@ -11547,7 +11699,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     final key = _normalizeSubjectKey(subject);
     bool has(String part) => key.contains(_normalizeSubjectKey(part));
 
-    // Subject -> [min, max]
+    // Subject -> [min, max] - من القوالب الرسمية المرفقة 7-8-9
     if (has('سلوك')) return const <String, double>{'min': 120, 'max': 200};
     if (has('عربي') || has('العربيه'))
       return const <String, double>{'min': 300, 'max': 600};
@@ -11556,6 +11708,9 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
       return const <String, double>{'min': 240, 'max': 600};
     if (has('انكليز') || has('انجليز'))
       return const <String, double>{'min': 160, 'max': 400};
+    // التاسع: لغات إضافية رسمية
+    if (has('تركي')) return const <String, double>{'min': 120, 'max': 300};
+    if (has('روس')) return const <String, double>{'min': 160, 'max': 400};
     if (has('فرنس') || has('اجنب') || has('اجنبيه') || has('اجنبية')) {
       return const <String, double>{'min': 160, 'max': 400};
     }
@@ -11575,12 +11730,108 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     return null;
   }
 
+  Map<String, double>? _secondaryOfficialMarks(String subject, int grade, bool isLiterary) {
+    final key = _normalizeSubjectKey(subject);
+    bool has(String part) => key.contains(_normalizeSubjectKey(part));
+
+    // لكل صف ثانوي حسب القوالب الرسمية المرفقة
+    if (grade == 10 && isLiterary) {
+      // العاشر أدبي 910/3300
+      if (has('تاريخ')) return const {'min': 40, 'max': 200};
+      if (has('دين')) return const {'min': 40, 'max': 200};
+      if (has('رياضه') || has('رياضيه')) return const {'min': 40, 'max': 200};
+      if (has('فني')) return const {'min': 40, 'max': 200};
+      if (has('جغراف')) return const {'min': 40, 'max': 200};
+      if (has('رياضيات')) return const {'min': 80, 'max': 400};
+      if (has('فلسف')) return const {'min': 40, 'max': 200};
+      if (has('اجنب') && !has('انكليز')) return const {'min': 80, 'max': 400};
+      if (has('انكليز')) return const {'min': 80, 'max': 400};
+      if (has('عربي')) return const {'min': 250, 'max': 500};
+      if (has('معلوم') || has('تكنلوج')) return const {'min': 40, 'max': 200};
+      if (has('سلوك')) return const {'min': 140, 'max': 200};
+    }
+    if (grade == 10 && !isLiterary) {
+      // العاشر علمي 860/3300
+      if (has('دين')) return const {'min': 40, 'max': 200};
+      if (has('رياضه')) return const {'min': 40, 'max': 200};
+      if (has('فني')) return const {'min': 40, 'max': 200};
+      if (has('رياضيات')) return const {'min': 80, 'max': 400};
+      if (has('فلسف')) return const {'min': 40, 'max': 200};
+      if (has('فيزياء')) return const {'min': 40, 'max': 200};
+      if (has('كيمياء')) return const {'min': 40, 'max': 200};
+      if (has('اجنب') && !has('انكليز')) return const {'min': 60, 'max': 300};
+      if (has('انكليز')) return const {'min': 60, 'max': 300};
+      if (has('عربي')) return const {'min': 200, 'max': 500};
+      if (has('معلوم') || has('تكنلوج')) return const {'min': 40, 'max': 200};
+      if (has('سلوك')) return const {'min': 140, 'max': 200};
+      if (has('احياء') || has('حيوية')) return const {'min': 40, 'max': 200};
+    }
+    if (grade == 11 && isLiterary) {
+      // الحادي عشر أدبي 980/3500
+      if (has('تاريخ')) return const {'min': 60, 'max': 300};
+      if (has('دين')) return const {'min': 40, 'max': 200};
+      if (has('رياضه')) return const {'min': 40, 'max': 200};
+      if (has('فني')) return const {'min': 40, 'max': 200};
+      if (has('جغراف')) return const {'min': 60, 'max': 300};
+      if (has('رياضيات')) return const {'min': 20, 'max': 100};
+      if (has('فلسف')) return const {'min': 80, 'max': 400};
+      if (has('اجنب') && !has('انكليز')) return const {'min': 80, 'max': 400};
+      if (has('انكليز')) return const {'min': 80, 'max': 400};
+      if (has('عربي')) return const {'min': 300, 'max': 600};
+      if (has('معلوم') || has('تكنلوج')) return const {'min': 40, 'max': 200};
+      if (has('سلوك')) return const {'min': 140, 'max': 200};
+    }
+    if (grade == 11 && !isLiterary) {
+      // الحادي عشر علمي 880/3500
+      if (has('دين')) return const {'min': 40, 'max': 200};
+      if (has('رياضه')) return const {'min': 40, 'max': 200};
+      if (has('رياضيات')) return const {'min': 120, 'max': 600};
+      if (has('فلسف')) return const {'min': 40, 'max': 200};
+      if (has('فيزياء')) return const {'min': 80, 'max': 400};
+      if (has('كيمياء')) return const {'min': 40, 'max': 200};
+      if (has('اجنب') && !has('انكليز')) return const {'min': 60, 'max': 300};
+      if (has('انكليز')) return const {'min': 60, 'max': 300};
+      if (has('عربي')) return const {'min': 160, 'max': 400};
+      if (has('معلوم') || has('تكنلوج')) return const {'min': 40, 'max': 200};
+      if (has('سلوك')) return const {'min': 140, 'max': 200};
+      if (has('احياء')) return const {'min': 60, 'max': 300};
+    }
+    if (grade == 12 && isLiterary) {
+      // الثاني عشر أدبي 1580/3800
+      if (has('تاريخ')) return const {'min': 120, 'max': 300};
+      if (has('دين')) return const {'min': 80, 'max': 200};
+      if (has('رياضه')) return const {'min': 80, 'max': 200};
+      if (has('فني')) return const {'min': 80, 'max': 200};
+      if (has('جغراف')) return const {'min': 120, 'max': 300};
+      if (has('فلسف')) return const {'min': 160, 'max': 400};
+      if (has('انكليز')) return const {'min': 160, 'max': 400};
+      if (has('روس')) return const {'min': 160, 'max': 400};
+      if (has('عربي')) return const {'min': 300, 'max': 600};
+      if (has('تركي')) return const {'min': 160, 'max': 400};
+      if (has('فرنس')) return const {'min': 160, 'max': 400};
+    }
+    if (grade == 12 && !isLiterary) {
+      // الثاني عشر علمي 1400/3500
+      if (has('دين')) return const {'min': 80, 'max': 200};
+      if (has('رياضه')) return const {'min': 80, 'max': 200};
+      if (has('رياضيات')) return const {'min': 240, 'max': 600};
+      if (has('فيزياء')) return const {'min': 160, 'max': 400};
+      if (has('كيمياء')) return const {'min': 80, 'max': 200};
+      if (has('انكليز')) return const {'min': 120, 'max': 300};
+      if (has('روس')) return const {'min': 120, 'max': 300};
+      if (has('عربي')) return const {'min': 160, 'max': 400};
+      if (has('احياء')) return const {'min': 120, 'max': 300};
+      if (has('تركي')) return const {'min': 120, 'max': 300};
+      if (has('فرنس')) return const {'min': 120, 'max': 300};
+    }
+    return null;
+  }
+
   Map<String, double>? _officialMarksForStudent(
     StudentRecord? student,
     String subject,
   ) {
     if (student == null) {
-      // Prefer the most specific known table when student grade is unknown.
       return _middleCycleOfficialMarks(subject) ??
           _upperPrimaryOfficialMarks(subject) ??
           _lowerPrimaryOfficialMarks(subject);
@@ -11593,6 +11844,13 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     }
     if (_isMiddleCycleGrade(student)) {
       return _middleCycleOfficialMarks(subject);
+    }
+    // ثانوي حسب الصف والفرع
+    final gradeNum = _studentGradeNumber(student);
+    if (gradeNum >= 10 && gradeNum <= 12) {
+      final isLit = _studentIsLiteraryTrack(student);
+      final sec = _secondaryOfficialMarks(subject, gradeNum, isLit);
+      if (sec != null) return sec;
     }
     return null;
   }
@@ -13155,46 +13413,46 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
 
     Widget metaPair(String label, String value) {
       return Container(
-        margin: const EdgeInsets.only(left: 4, bottom: 4),
+        margin: const EdgeInsets.only(left: 3, bottom: 2),
         decoration: BoxDecoration(
           color: const Color(0xFFF4F7F8),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(6),
           border: Border.all(color: const Color(0xFFD3DEE4)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
               decoration: const BoxDecoration(
                 color: Color(0xFFE4ECEE),
                 borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(7),
-                  bottomRight: Radius.circular(7),
+                  topRight: Radius.circular(5),
+                  bottomRight: Radius.circular(5),
                 ),
               ),
               child: Text(
                 label,
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 9,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFF2F4F4F),
                 ),
               ),
             ),
             ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 64, maxWidth: 150),
+              constraints: const BoxConstraints(minWidth: 50, maxWidth: 200),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 7,
+                  horizontal: 6,
+                  vertical: 3,
                 ),
                 child: Text(
                   value.trim().isEmpty ? '-' : value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF172727),
                   ),
@@ -13225,7 +13483,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
       width: _SchoolShellPageState._examReportCardWidth,
       height: _SchoolShellPageState._examReportCardWidth * 297 / 210,
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 14),
+      padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Column(
@@ -13237,8 +13495,8 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 SizedBox(
-                  width: 72,
-                  height: 72,
+                  width: 58,
+                  height: 58,
                   child: Image.asset(
                     'assets/qr-rose.jpeg',
                     fit: BoxFit.contain,
@@ -13251,18 +13509,18 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                         'الجلاء المدرسي',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 19,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF2F6F6D),
                           height: 1.0,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         year,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 12,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF2F6F6D),
                         ),
@@ -13271,28 +13529,28 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                   ),
                 ),
                 SizedBox(
-                  width: 96,
+                  width: 80,
                   child: Column(
                     children: <Widget>[
                       ClipRRect(
                         borderRadius: BorderRadius.circular(999),
                         child: Image.asset(
                           'image/logo.jpg',
-                          width: 44,
-                          height: 44,
+                          width: 36,
+                          height: 36,
                           fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
                       const Text(
                         schoolName,
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         style: TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 9,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF1F6B69),
-                          height: 1.15,
+                          height: 1.1,
                         ),
                       ),
                     ],
@@ -13300,67 +13558,91 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             // Meta chips — RTL wrap starts from the right
+            // أنيق: توزيع التسميات بشكل متساوي مع تباعد جميل
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(6, 5, 6, 1),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFB),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFD8E3E8)),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE0E8EC)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1F6B69).withOpacity(0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  )
+                ],
               ),
-              child: Wrap(
-                alignment: WrapAlignment.start,
-                children: <Widget>[
-                  metaPair('المديرية', directorate),
-                  metaPair('المجمع', complexName),
-                  metaPair('المدرسة', schoolName),
-                  metaPair('الصف', _studentGradeDisplay(student)),
-                  metaPair('الشعبة', _studentSectionDisplay(student)),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: metaPair('المديرية', directorate)),
+                      const SizedBox(width: 3),
+                      Expanded(child: metaPair('المجمع', complexName)),
+                      const SizedBox(width: 3),
+                      Expanded(flex: 2, child: metaPair('المدرسة', schoolName)),
+                      const SizedBox(width: 3),
+                      Expanded(child: metaPair('الصف', _readableGradeDisplay(student))),
+                      const SizedBox(width: 3),
+                      Expanded(child: metaPair('الشعبة', _readableSectionDisplay(student))),
+                    ],
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 4),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(6, 5, 6, 1),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFB),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFD8E3E8)),
+                color: const Color(0xFFF8FFFE),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFD6E8E6)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1F6B69).withOpacity(0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  )
+                ],
               ),
-              child: Wrap(
-                alignment: WrapAlignment.start,
-                children: <Widget>[
-                  metaPair('اسم الطالب', student.fullName),
-                  metaPair('اسم الأم', student.motherName),
-                  metaPair(
+              child: Row(
+                children: [
+                  Expanded(flex: 2, child: metaPair('اسم الطالب', student.fullName)),
+                  const SizedBox(width: 4),
+                  Expanded(child: metaPair('اسم الأم', student.motherName)),
+                  const SizedBox(width: 4),
+                  Expanded(child: metaPair(
                     'المواليد',
                     '${student.birthPlace} ${student.birthDate}'.trim(),
-                  ),
-                  metaPair('الرقم في السجل العام', student.serial),
+                  )),
+                  const SizedBox(width: 4),
+                  Expanded(child: metaPair('الرقم', student.serial)),
                 ],
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // Premium fix: fill A4 without large white space, keep official shape
+                  // تصغير ثاني 1/8 + زيادة خط بمقدار 2
                   final available = constraints.maxHeight;
-                  final headerH = 42.0;
-                  final totalsH = 32.0;
+                  final headerH = 23.0;
+                  final totalsH = 19.0;
                   final remainingForSubjects =
                       (available - (headerH * 2) - totalsH).clamp(
-                        80.0,
+                        60.0,
                         available,
                       );
                   final subjectH = subjects.isEmpty
-                      ? 32.0
+                      ? 34.0
                       : (remainingForSubjects / subjects.length).clamp(
-                          28.0,
-                          90.0,
+                          26.0,
+                          60.0,
                         );
 
                   Widget cell(
@@ -13683,13 +13965,13 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                 },
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(
                 color: const Color(0xFFF7F9FA),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
                 border: Border.all(color: const Color(0xFFD7E1E8)),
               ),
               child: Row(
@@ -13700,7 +13982,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        fontSize: 12,
+                        fontSize: 10,
                         color: hasNoGrades
                             ? const Color(0xFF6B7280)
                             : resultLabel == 'ناجح'
@@ -13716,7 +13998,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       style: const TextStyle(
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF123A78),
-                        fontSize: 12.5,
+                        fontSize: 10.5,
                       ),
                     ),
                   ),
@@ -13727,7 +14009,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                       style: const TextStyle(
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF1F6B69),
-                        fontSize: 12.5,
+                        fontSize: 10.5,
                       ),
                     ),
                   ),
@@ -13735,28 +14017,36 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
               ),
             ),
             const SizedBox(height: 6),
-            // Signatures immediately under grades; white space only under the names.
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(child: _examSignatureBlock('مشرف القسم', supervisor)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _examSignatureBlock(
-                    'أمانة السر والأشراف العام',
-                    secretariat,
+            // التواقيع: الأسماء تظهر من قسم الاعتماد بالإدارة تحت التسمية المخصصة - تم حذف عبارة الختم والتوقيع فقط
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFBFDFC),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: const Color(0xFFE3EDEB), width: 0.8),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(child: _examSignatureBlock('مشرف القسم', supervisor)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _examSignatureBlock(
+                      'أمانة السر والإشراف العام',
+                      secretariat,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(child: _examSignatureBlock('المدير', director)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _examSignatureBlock('رئيس مجلس الإدارة', chairman),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Expanded(child: _examSignatureBlock('المدير', director)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _examSignatureBlock('رئيس مجلس الإدارة', chairman),
+                  ),
+                ],
+              ),
             ),
-            // Fixed: no large white space - small margin only
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
           ],
         ),
       ),
@@ -13773,10 +14063,10 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
           style: const TextStyle(
             color: AppPalette.deepNavySoft,
             fontWeight: FontWeight.w900,
-            fontSize: 10.5,
+            fontSize: 9,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           value,
           textAlign: TextAlign.center,
@@ -13785,11 +14075,11 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
           style: const TextStyle(
             color: AppPalette.muted,
             fontWeight: FontWeight.w700,
-            fontSize: 9.5,
+            fontSize: 8.5,
           ),
         ),
-        const SizedBox(height: 10),
-        const Divider(thickness: 1.0, color: Color(0xFFB7C5D6)),
+        const SizedBox(height: 6),
+        const Divider(thickness: 0.9, color: Color(0xFFB7C5D6)),
       ],
     );
   }
@@ -13803,20 +14093,20 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
   }) {
     return Container(
       color: cellColor ?? Colors.transparent,
-      // Fill A4 height: taller cells reduce empty whitespace under the table.
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+      // زيادة بمقدار 2 للدرجات فقط (الارقام) + تصغير ثاني 1/8
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
       alignment: Alignment.center,
       child: Text(
         text,
         textAlign: TextAlign.center,
-        maxLines: 3,
+        maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: isHeader
               ? Colors.white
               : (textColor ?? const Color(0xFF152525)),
           fontWeight: isHeader || bold ? FontWeight.w900 : FontWeight.w700,
-          fontSize: isHeader ? 12 : 11.5,
+          fontSize: isHeader ? 14 : 13.5,
           height: 1.15,
         ),
       ),
