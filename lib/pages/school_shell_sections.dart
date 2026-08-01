@@ -13629,20 +13629,20 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // تصغير ثاني 1/8 + زيادة خط بمقدار 2
+                  // تصغير 1/6 أخير - قابل للارجاع عبر تاغ pre-1_6-reduction
                   final available = constraints.maxHeight;
-                  final headerH = 23.0;
-                  final totalsH = 19.0;
+                  final headerH = 19.0;
+                  final totalsH = 16.0;
                   final remainingForSubjects =
                       (available - (headerH * 2) - totalsH).clamp(
-                        60.0,
+                        50.0,
                         available,
                       );
                   final subjectH = subjects.isEmpty
-                      ? 34.0
+                      ? 28.0
                       : (remainingForSubjects / subjects.length).clamp(
-                          26.0,
-                          60.0,
+                          22.0,
+                          50.0,
                         );
 
                   Widget cell(
