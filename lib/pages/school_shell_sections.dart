@@ -13629,20 +13629,20 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // إصلاح نهائي جذري: إلغاء FittedBox + عرض A4 كامل بدون تصغير - بلا تشويه نهائياً
+                  // الرسمي 100% بدون أي تصغير - 42/32/32 - بلا تشويه نهائياً
                   final available = constraints.maxHeight;
-                  final headerH = 32.0;
-                  final totalsH = 28.0;
+                  final headerH = 42.0;
+                  final totalsH = 32.0;
                   final remainingForSubjects =
                       (available - (headerH * 2) - totalsH).clamp(
                         80.0,
                         available,
                       );
                   final subjectH = subjects.isEmpty
-                      ? 42.0
+                      ? 32.0
                       : (remainingForSubjects / subjects.length).clamp(
-                          32.0,
-                          58.0,
+                          28.0,
+                          90.0,
                         );
 
                   Widget cell(
@@ -14093,8 +14093,8 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
   }) {
     return Container(
       color: cellColor ?? Colors.transparent,
-      // نهائي بلا تشويه: خط 14/13.5 مع ارتفاع متوازن
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+      // زيادة بمقدار 2 للدرجات فقط (الارقام) + تصغير ثاني 1/8
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
       alignment: Alignment.center,
       child: Text(
         text,
