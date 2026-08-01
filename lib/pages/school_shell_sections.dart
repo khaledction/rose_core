@@ -13083,7 +13083,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     Widget headerCell(String text, {int flex = 1}) => Expanded(
       flex: flex,
       child: Container(
-        height: 34,
+        height: 42,
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
         decoration: const BoxDecoration(color: Color(0xFF1F6B69)),
@@ -13108,7 +13108,7 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
     }) => Expanded(
       flex: flex,
       child: Container(
-        height: 43,
+        height: 56,
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
         decoration: BoxDecoration(
@@ -14898,23 +14898,9 @@ extension _SchoolShellPageSections on _SchoolShellPageState {
                     constraints: const BoxConstraints(
                       maxWidth: _SchoolShellPageState._examReportCardWidth,
                     ),
-                    child: AspectRatio(
-                      aspectRatio: 210 / 297,
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        alignment: Alignment.topCenter,
-                        child: SizedBox(
-                          width: _SchoolShellPageState._examReportCardWidth,
-                          height:
-                              _SchoolShellPageState._examReportCardWidth *
-                              297 /
-                              210,
-                          child: RepaintBoundary(
-                            key: _examReportBoundaryKey,
-                            child: _examReportCardPortrait(student, subjects),
-                          ),
-                        ),
-                      ),
+                    child: RepaintBoundary(
+                      key: _examReportBoundaryKey,
+                      child: _examReportCard(student, subjects),
                     ),
                   ),
                 ),
